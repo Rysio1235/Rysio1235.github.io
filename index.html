@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprzedaż Sushi - Twoja Sushi Wyspa</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Twoja Sushi Wyspa</h1>
+        <nav>
+            <ul>
+                <li><a href="#menu">Menu</a></li>
+                <li><a href="#about">O Nas</a></li>
+                <li><a href="#contact">Kontakt</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="menu">
+        <h2>Nasze Menu</h2>
+        <div class="menu-item">
+            <img src="scr.jpg" alt="Sushi 1">
+            <h3>Sushi California Roll</h3>
+            <p>Delikatne kalifornijskie rolki z krabem, ogórkiem i awokado.</p>
+            <p class="price">Cena: 25 zł</p>
+            <button class="order-button" data-item-name="Sushi California Roll" data-item-price="25">Zamów teraz</button>
+        </div>
+        <!-- Dodaj więcej elementów menu -->
+    </section>
+
+    <section id="about">
+        <h2>O Nas</h2>
+        <p>Jesteśmy pasjonatami sushi i pragniemy dostarczać naszym klientom najwyższej jakości dania przygotowane z najlepszych składników.</p>
+    </section>
+
+    <section id="contact">
+        <h2>Kontakt</h2>
+        <p>Zapraszamy do odwiedzenia naszej restauracji w [Adres] lub skontaktowania się z nami pod numerem telefonu [Numer telefonu] lub adresem e-mail: [Adres e-mail].</p>
+    </section>
+
+    <footer>
+        <p>&copy; 2023 Twoja Sushi Wyspa. Wszelkie prawa zastrzeżone.</p>
+    </footer>
+
+    <script src="https://www.paypal.com/sdk/js?client-id=AbRREqHjnYzCNSgX6gQaS8MUURuFTxhsntBgomivf5BFmsH1TVr3CZyTqrd80wRad4IOQdFr-zbPRI63"></script>
+    <script>
+        document.querySelectorAll('.order-button').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var itemName = button.getAttribute('data-item-name');
+                var itemPrice = button.getAttribute('data-item-price');
+                
+                paypal.Buttons({
+                    createOrder: function(data, actions) {
+                        return actions.order.create({
+                            purchase_units: [{
+                                amount: {
+                                    value: itemPrice
+                                }
+                            }]
+                        });
+                    },
+                    onApprove: function(data, actions) {
+                        return actions.order.capture().then(function(details) {
+                            // Wysyłka danych do order.php
+                            var xhr = new XMLHttpRequest();
+                            xhr.open('POST', 'order.php', true);
+                            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                            xhr.send('item_name=' + itemName + '&item_price=' + itemPrice);
+                            
+                            alert('Dziękujemy za zamówienie ' + itemName + '! Twój numer transakcji: ' + details.id);
+                        });
+                    },
+                    onError: function(error) {
+                        console.log(error);
+                        alert('Wystąpił błąd podczas płatności. Spróbuj ponownie później.');
+                    }
+                }).render();
+            });
+        });
+    </script>
+</body>
+</html>
